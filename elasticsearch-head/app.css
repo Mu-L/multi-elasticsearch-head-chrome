@@ -1,3 +1,17 @@
+BODY {
+font-size:50%;
+}
+BUTTON {
+font-size:100%;
+}
+TABLE.table-padding TH, TABLE.table-padding TD{
+	padding-left: 10px;
+	padding-right:10px;
+	padding-top: 2px;
+	padding-bottom:2px;
+}
+
+
 TABLE.table {
 	border-collapse: collapse;
 }
@@ -6,7 +20,7 @@ TABLE.table {
 TABLE.table TH {
 	font-weight: normal;
 	text-align: left;
-	vertical-align: middle;
+	vertical-align: top;
 }
 
 TABLE.table TBODY.striped TR:nth-child(odd) {
@@ -16,7 +30,7 @@ TABLE.table TBODY.striped TR:nth-child(odd) {
 TABLE.table H3 {
 	margin: 0;
 	font-weight: bold;
-	font-size: 140%;
+	font-size: 100%;
 }
 
 .require { color: #a00; }
@@ -32,7 +46,7 @@ TABLE.table H3 {
 }
 
 .uiButton-content {
-	height: 20px;
+	height: 15px;
 	border: 1px solid #668dc6;
 	border-radius: 2px;
 	background: #96c6eb;
@@ -67,6 +81,7 @@ TABLE.table H3 {
 		background: -moz-linear-gradient(top, #ddd, #ddd);
 		background: -webkit-linear-gradient(top, #ddd, #ddd);
 }
+
 
 .uiButton.disabled {
 		cursor: default;
@@ -110,7 +125,7 @@ TABLE.table H3 {
 	border-left-color: #96c6eb;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	height: 20px;
+	height: 15px;
 }
 
 .uiSplitButton .uiButton:last-child .uiButton-label {
@@ -543,7 +558,7 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 .uiNodesView TH,
 .uiNodesView TD {
 	vertical-align: top;
-	padding: 2px 20px;
+	padding: 2px 5px;
 }
 
 .uiNodesView TH.close,
@@ -554,8 +569,8 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 
 .uiNodesView .uiMenuButton .uiButton-content {
 	padding-right: 3px;
-	border-radius: 8px;
-	height: 14px;
+	border-radius: 4px;
+	height: 12px;
 }
 
 .uiNodesView .uiMenuButton.active .uiButton-content,
@@ -586,7 +601,7 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 }
 
 .uiNodesView TD.uiNodesView-icon {
-	padding: 20px 0px 15px 20px;
+	padding: 10px 10px 10px 10px;
 }
 
 .uiNodesView-node:nth-child(odd) {
@@ -603,21 +618,21 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 	box-sizing: border-box;
 	cursor: pointer;
 	float: left;
-	height: 40px;
-	width: 35px;
-	margin: 4px;
-	border: 2px solid #444;
-	padding: 2px;
-	font-size: 32px;
-	line-height: 32px;
+	height: 20px;
+	width: 20px;
+	margin: 2px;
+	border: 1px solid #444;
+	padding-top: -15px;
+	font-size: 13px;
+	line-height: 20px;
 	text-align: center;
-	letter-spacing: -5px;
-	text-indent: -7px;
+	letter-spacing: 0px;
+	text-indent: 0px;
 }
 
 .uiNodesView-replica.primary {
-	border-width: 4px;
-	line-height: 29px;
+	border-width: 2px;
+	line-height: 16px;
 }
 
 .uiNodesView-nullReplica {
@@ -628,6 +643,7 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 .uiNodesView-replica.state-INITIALIZING { background: #dddc88; }
 .uiNodesView-replica.state-STARTED { background: #99dd88; }
 .uiNodesView-replica.state-RELOCATING { background: #dc88dd; }
+.uiNodesView-replica.primary.state-STARTED { background: #88ff88; }
 
 
 .uiClusterConnect-uri {
@@ -657,9 +673,10 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 }
 
 .uiHeader-name, .uiHeader-status {
+	margin-left:5px;
 	font-size: 1.2em;
 	font-weight: bold;
-	padding: 0 10px;
+	padding: 5px 10px;
 }
 
 
@@ -701,4 +718,14 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 
 .uiApp-headerNewMenuItem {
 	color: blue;
+}
+
+.uiDisplayNone {
+	display: none;
+}
+.uiClusterSelector-select select {
+	font-size: 80%;
+	padding:5px;
+	margin-left:5px;
+	margin-right:5px;
 }

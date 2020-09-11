@@ -832,6 +832,7 @@
 			this.config.cluster.get("_cluster/state", function(data) {
 				this.metaData = new app.data.MetaData({state: data});
 				this.fire("ready", this.metaData,  { originalData: data, "k": 1 }); // TODO originalData needed for legacy ui.FilterBrowser
+				$("body").trigger("onconnect", [ data ]);
 			}.bind(this), function() {
 
 				var _this = this;
@@ -860,7 +861,6 @@
 					_this.metaData = new app.data.MetaData({state: clusterState});
 					_this.fire("ready", _this.metaData, {originalData: clusterState});
 				});
-
 			}.bind(this));
 		}
 	});
@@ -1335,12 +1335,14 @@
 			this.clusterNodes = null;
 		},
 		refresh: function() {
-			var self = this, clusterState, status, nodeStats, clusterNodes, clusterHealth;
+			var self = this, clusterState, status, nodeStats, clusterNodes, clusterHealth, aliases;
 			function updateModel() {
-				if( clusterState && status && nodeStats && clusterNodes && clusterHealth ) {
+				if( clusterState && status && nodeStats && clusterNodes && clusterHealth && aliases && indexStats ) {
 					this.clusterState = clusterState;
 					this.status = status;
 					this.nodeStats = nodeStats;
+					this.aliases = aliases;
+					this.indexStats = indexStats;
 					this.clusterNodes = clusterNodes;
 					this.clusterHealth = clusterHealth;
 					this.fire( "data", this );
@@ -1349,6 +1351,7 @@
 			var _cluster = this.cluster;
 			_cluster.get("_cluster/state", function( data ) {
 				clusterState = data;
+				$("body").trigger("onconnect", [ data ]);
 				updateModel.call( self );
 			},function() {
 
@@ -1376,6 +1379,15 @@
 				});
 
 			});
+			this.cluster.get("_aliases", function( data ) {
+				aliases = data;
+				updateModel.call( self );
+			});
+			this.cluster.get("_cat/indices?format=json&h=health,status,index,id,shardsPrimary,shardsReplica,docsCount,docsDeleted,storeSize,creation.date.string", function( data ) {
+				indexStats = data;
+				updateModel.call( self );
+			});
+
 			this.cluster.get("_stats", function( data ) {
 				status = data;
 				updateModel.call( self );
@@ -3768,52 +3780,106 @@
 		defaults: {
 			cluster: null
 		},
-		init: function() {
+		init: function () {
 			this._super();
 			this.prefs = services.Preferences.instance();
 			this.cluster = this.config.cluster;
 			this.el = $.joey(this._main_template());
-			this.cluster.get( "", this._node_handler );
+			this._updateServerSelect();
+			this.cluster.get("", this._node_handler);
+			$("body").bind("onconnect", this._addServer_handler);
+
 		},
 
-		_node_handler: function(data) {
-			if(data) {
+		_node_handler: function (data) {
+			if (data) {
 				this.prefs.set("app-base_uri", this.cluster.base_uri);
-				if(data.version && data.version.number)
+				if (data.version && data.version.number)
 					this.cluster.setVersion(data.version.number);
 			}
 		},
 
-		_reconnect_handler: function() {
+		_reconnect_handler: function () {
 			var base_uri = this.el.find(".uiClusterConnect-uri").val();
 			var url;
-			if(base_uri.indexOf("?") !== -1) {
-				url = base_uri.substring(0, base_uri.indexOf("?")-1);
+			if (base_uri.indexOf("?") !== -1) {
+				url = base_uri.substring(0, base_uri.indexOf("?") - 1);
 			} else {
 				url = base_uri;
 			}
-			var argstr = base_uri.substring(base_uri.indexOf("?")+1, base_uri.length);
-			var args = argstr.split("&").reduce(function(r, p) {
+			var argstr = base_uri.substring(base_uri.indexOf("?") + 1, base_uri.length);
+			var args = argstr.split("&").reduce(function (r, p) {
 				r[decodeURIComponent(p.split("=")[0])] = decodeURIComponent(p.split("=")[1]);
 				return r;
 			}, {});
-			$("body").empty().append(new app.App("body", { id: "es",
+			$("body").empty().append(new app.App("body", {
+				id: "es",
 				base_uri: url,
-			 	auth_user : args["auth_user"] || "",
-			 	auth_password : args["auth_password"] || ""
+				auth_user: args["auth_user"] || "",
+				auth_password: args["auth_password"] || ""
 			}));
 		},
-
+		_selectCluster_template: function(options) {
+			return { tag: "SELECT", children: options, onChange: this._changeCluster_handler };
+		},
+		_optionCluster_template: function(uri, name) {
+			return  { tag: "OPTION", value: uri, text: name + " (" + uri + ")" };
+		},
+		_updateServerSelect: function (select_uri) {
+			var cluster_list = this.prefs.get("app-cluster_list");
+			var options = [];
+			if (cluster_list) {
+				for(i in cluster_list) {
+					name = cluster_list[i].name;
+					uri = cluster_list[i].uri;
+					if (!uri) continue;
+					if (uri.indexOf('?') != -1) continue;
+					options.push(this._optionCluster_template(uri, name));
+				}
+			}
+			this.el.find(".uiClusterSelector-select").empty().append(this._selectCluster_template(options));
+			if (select_uri)
+				this.el.find(".uiClusterSelector-select select").val(select_uri);
+		},
+		_addServer_handler: function (event, data) {
+			var base_uri = this.el.find(".uiClusterConnect-uri").val();
+			cluster_list = this.prefs.get("app-cluster_list");
+			if (!cluster_list) {
+				cluster_list = { };
+			}
+			cluster_list[base_uri] = { uri: base_uri, name: data.cluster_name };
+			this.prefs.set("app-cluster_list", cluster_list);
+			this._updateServerSelect(base_uri);
+		},
+		_removeServer_handler: function () {
+			cluster_list = this.prefs.get("app-cluster_list");
+			delete cluster_list[this.el.find(".uiClusterSelector-select select").val()];
+			this.prefs.set("app-cluster_list", cluster_list);
+			this._updateServerSelect();
+			this._reconnect_handler();
+		},
+		_changeCluster_handler: function () {
+			var uri = this.el.find(".uiClusterSelector-select select").val();
+			this.el.find(".uiClusterConnect-uri").val(uri);
+			this._reconnect_handler();
+			this._updateServerSelect(uri);
+		},
+		_promptConnect_handler: function() {
+			this.el.find(".uiClusterConnect-uri").val(prompt("Elasticsearch End-point URI?",this.el.find(".uiClusterConnect-uri").val()));
+			this._reconnect_handler();
+		},
 		_main_template: function() {
-			return { tag: "SPAN", cls: "uiClusterConnect", children: [
-				{ tag: "INPUT", type: "text", cls: "uiClusterConnect-uri", onkeyup: function( ev ) {
+            return { tag: "SPAN", cls: "uiClusterConnect", children: [
+					{ tag: "BUTTON", type: "button", text: i18n.text("Header.NewConnect"), onclick: this._promptConnect_handler },
+					{ tag: "INPUT", type: "hidden", cls: "uiClusterConnect-uri", onkeyup: function( ev ) {
 					if(ev.which === 13) {
 						ev.preventDefault();
 						this._reconnect_handler();
 					}
 				}.bind(this), id: this.id("baseUri"), value: this.cluster.base_uri },
-				{ tag: "BUTTON", type: "button", text: i18n.text("Header.Connect"), onclick: this._reconnect_handler }
-			]};
+				{ tag: "SPAN", type: "span", cls: "uiClusterSelector-select" },
+				{ tag: "BUTTON", type: "button", text: i18n.text("Header.ServerListRemove"), onclick: this._removeServer_handler }
+				]};
 		}
 	});
 
@@ -4231,7 +4297,7 @@
 		_main_template: function() { return (
 			{ tag: "DIV", cls: this._baseCls, children: [
 				this._clusterConnect,
-				{ tag: "SPAN", cls: "uiHeader-name" },
+				{ tag: "SPAN", cls: "uiHeader-name uiDisplayNone" },
 				{ tag: "SPAN", cls: "uiHeader-status" },
 				{ tag: "H1", text: i18n.text("General.Elasticsearch") },
 				{ tag: "SPAN", cls: "pull-right", children: [
@@ -4275,6 +4341,22 @@
 					return a.name < b.name ? -1 : 1;
 				})
 			};
+			for (i in view.indices) {
+				for (ind in state.indexStats) {
+					if (view.indices[i].name == state.indexStats[ind].index) {
+						view.indices[i].shardsPrimary = state.indexStats[ind].shardsPrimary;
+						view.indices[i].shardsReplica = state.indexStats[ind].shardsReplica;
+						view.indices[i].creationDate = state.indexStats[ind]["creation.date.string"];
+						view.indices[i].docsDeleted = state.indexStats[ind].docsDeleted;
+						view.indices[i].health = state.indexStats[ind].health;
+					}
+				}
+				for (ind in state.aliases) {
+					if (view.indices[i].name == ind) {
+						view.indices[i].aliases = Object.keys(state.aliases[ind].aliases);
+					}
+				}
+			}
 			this._indexViewEl && this._indexViewEl.remove();
 			this._indexViewEl = $( this._indexTable_template( view ) );
 			this.el.find(".uiIndexOverview-table").append( this._indexViewEl );
@@ -4315,29 +4397,56 @@
 			}).open();
 		},
 		_indexTable_template: function( view ) { return (
-			{ tag: "TABLE", cls: "table", children: [
+			{ tag: "TABLE", cls: "table table-padding", children: [
 				{ tag: "THEAD", children: [
 					{ tag: "TR", children: [
-						{ tag: "TH" },
+							{ tag: "TH" },
+							{ tag: "TH", children: [
+									{ tag: "STRONG", text: "Aliases" }
+								] },
+							{ tag: "TH", children: [
+									{ tag: "STRONG", text: "Creation Date" }
+								] },
+
+
 						{ tag: "TH", children: [
-							{ tag: "H3", text: "Size" }
+							{ tag: "STRONG", text: "Size" }
 						] },
 						{ tag: "TH", children: [
-							{ tag: "H3", text: "Docs" }
+							{ tag: "STRONG", text: "Docs" }
+						] },
+
+							{ tag: "TH", children: [
+									{ tag: "STRONG", text: "Deleted" }
+								] },
+							{ tag: "TH", children: [
+									{ tag: "STRONG", text: "#Primary Shard" }
+								] },
+							{ tag: "TH", children: [
+									{ tag: "STRONG", text: "#Replica Shard"}
+								] }
 						] }
-					] }
 				] },
 				{ tag: "TBODY", cls: "striped", children: view.indices.map( this._index_template, this ) }
 			] }
 		); },
 
-		_index_template: function( index ) { return (
+		_index_template: function( index ) {
+			return (
 			{ tag: "TR", children: [
 				{ tag: "TD", children: [
-					{ tag: "H3", text: index.name }
+					{ tag: "STRONG", text: index.name }
 				] },
+					{ tag: "TD", text: index.aliases.join(',') },
+					{ tag: "TD", text: index.creationDate },
+
 				{ tag: "TD", text: ut.byteSize_template( index.state.primaries.store.size_in_bytes ) + "/" + ut.byteSize_template( index.state.total.store.size_in_bytes ) },
-				{ tag: "TD", text: ut.count_template( index.state.primaries.docs.count ) }
+				{ tag: "TD", text: ut.count_template( index.state.primaries.docs.count ) },
+
+					{ tag: "TD", text: index.docsDeleted },
+					{ tag: "TD", text: index.shardsPrimary },
+					{ tag: "TD", text: index.shardsReplica }
+
 			] }
 		); },
 		_main_template: function() {
@@ -4366,7 +4475,8 @@
 
 	app.App = ui.AbstractWidget.extend({
 		defaults: {
-			base_uri: null
+			base_uri: null,
+			cluster_list: []
 		},
 		init: function(parent) {
 			this._super();
