@@ -2,7 +2,13 @@ BODY {
 font-size:50%;
 }
 BUTTON {
-font-size:100%;
+font-size:100%
+}
+SELECT {
+font-size:120%;
+}
+INPUT,TEXTAREA {
+font-size:120%;
 }
 TABLE.table-padding TH, TABLE.table-padding TD{
 	padding-left: 10px;
@@ -47,11 +53,12 @@ TABLE.table H3 {
 
 .uiButton-content {
 	height: 15px;
+	padding-top:2px;
 	border: 1px solid #668dc6;
 	border-radius: 2px;
 	background: #96c6eb;
-	background: -moz-linear-gradient(top, #96c6eb, #5296c7);
-	background: -webkit-linear-gradient(top, #96c6eb, #5296c7);
+	xbackground: -moz-linear-gradient(top, #96c6eb, #5296c7);
+	xbackground: -webkit-linear-gradient(top, #96c6eb, #5296c7);
 	color: white;
 	font-weight: bold;
 }
@@ -64,22 +71,22 @@ TABLE.table H3 {
 }
 .uiButton:hover .uiButton-content {
 	background: #2777ba;
-	background: -moz-linear-gradient(top, #6aaadf, #2777ba);
-	background: -webkit-linear-gradient(top, #6aaadf, #2777ba);
+	xbackground: -moz-linear-gradient(top, #6aaadf, #2777ba);
+	xbackground: -webkit-linear-gradient(top, #6aaadf, #2777ba);
 }
 .uiButton.active .uiButton-content,
 .uiButton:active .uiButton-content {
 	background: #2575b7;
-	background: -moz-linear-gradient(top, #2576b8, #2575b7);
-	background: -webkit-linear-gradient(top, #2576b8, #2575b7);
+	xbackground: -moz-linear-gradient(top, #2576b8, #2575b7);
+	xbackground: -webkit-linear-gradient(top, #2576b8, #2575b7);
 }
 .uiButton.disabled .uiButton-content,
 .uiButton.disabled:active .uiButton-content {
 		border-color: #c6c6c6;
 		color: #999999;
 		background: #ddd;
-		background: -moz-linear-gradient(top, #ddd, #ddd);
-		background: -webkit-linear-gradient(top, #ddd, #ddd);
+		xbackground: -moz-linear-gradient(top, #ddd, #ddd);
+		xbackground: -webkit-linear-gradient(top, #ddd, #ddd);
 }
 
 
@@ -674,7 +681,7 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 
 .uiHeader-name, .uiHeader-status {
 	margin-left:5px;
-	font-size: 1.2em;
+	font-size: 1.5em;
 	font-weight: bold;
 	padding: 5px 10px;
 }
@@ -695,7 +702,7 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 
 .uiApp-headerMenu {
 	border-bottom: 1px solid #bbb;
-	padding: 0px 3px;
+	padding: 2px 5px 2px 5px;
 	height: 22px;
 }
 
@@ -724,8 +731,8 @@ SPAN.uiJsonPretty-boolean { color: purple; }
 	display: none;
 }
 .uiClusterSelector-select select {
-	font-size: 80%;
-	padding:5px;
+	font-size: 150%;
+	padding:2px 5px 2px 5px;
 	margin-left:5px;
 	margin-right:5px;
 }
