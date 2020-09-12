@@ -1335,7 +1335,7 @@
 			this.clusterNodes = null;
 		},
 		refresh: function() {
-			var self = this, clusterState, status, nodeStats, clusterNodes, clusterHealth, aliases;
+			var self = this, clusterState, status, nodeStats, clusterNodes, clusterHealth, aliases, indexStats;
 			function updateModel() {
 				if( clusterState && status && nodeStats && clusterNodes && clusterHealth && aliases && indexStats ) {
 					this.clusterState = clusterState;
@@ -2911,12 +2911,16 @@
 		},
 		_responseError_handler: function (response) {
 			var obj;
+			console.log(response);
 			try {
 				obj = JSON.parse(response.responseText);
 				if (obj) {
 					this._responseWriter_handler(obj);
 				}
 			} catch (err) {
+				// handle non json response.
+				this.outEl.empty();
+				this.outEl.append("<br/><pre>" + response.responseText + "</pre>");
 			}
 		},
 		_responseWriter_handler: function(data) {
