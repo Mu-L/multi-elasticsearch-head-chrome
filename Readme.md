@@ -5,7 +5,7 @@ This is a major improvement over Elasticsearch Head extension.
 * More minimal look
 * Able to handle non-JSON response in Any Request tab
 
-- [ ] Pending Review for Google Webstore
+- [X] This extension is still "Pending Review" for Google Webstore (2020-09-16)
 
 ## Synopsis
 
