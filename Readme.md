@@ -1,3 +1,10 @@
+# Multi Elasticsearch Head
+
+This is a major improvement over Elasticsearch Head extension.
+* Add dropdown for multiple Elasticsearch Head end-points
+* More minimal look
+* Able to handle non-JSON response in Any Request tab
+
 ## Synopsis
 
 Chrome Extension containing the excellent [ElasticSearch Head](https://github.com/mobz/elasticsearch-head) application.
