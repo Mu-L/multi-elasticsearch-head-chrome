@@ -5,6 +5,8 @@ This is a major improvement over Elasticsearch Head extension.
 * More minimal look
 * Able to handle non-JSON response in Any Request tab
 
+- [ ] Pending Review for Google Webstore
+
 ## Synopsis
 
 Chrome Extension containing the excellent [ElasticSearch Head](https://github.com/mobz/elasticsearch-head) application.
