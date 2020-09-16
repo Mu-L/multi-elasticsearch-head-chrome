@@ -18,6 +18,7 @@ i18n.setKeys({
 	"AnyRequest.AsGraph" : "グラフの表示",
 	"AnyRequest.AsJson" : "生の JSON を表示",
 	"AnyRequest.AsTable" : "テーブルの表示",
+	"AnyRequest.Failed": "失敗した...",
 	"AnyRequest.History" : "履歴",
 	"AnyRequest.RepeatRequest" : "繰り返しリクエストを投げる",
 	"AnyRequest.RepeatRequestSelect" : "次の間隔でリクエストを繰り返す",

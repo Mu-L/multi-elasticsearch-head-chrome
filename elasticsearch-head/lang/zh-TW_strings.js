@@ -18,6 +18,7 @@ i18n.setKeys({
 	"AnyRequest.AsGraph" : "圖形視圖",
 	"AnyRequest.AsJson" : "原始 JSON",
 	"AnyRequest.AsTable" : "表格視圖",
+	"AnyRequest.Failed" : "失敗的...",
 	"AnyRequest.History" : "歷史記錄",
 	"AnyRequest.RepeatRequest" : "重複請求",
 	"AnyRequest.RepeatRequestSelect" : "重複周期 ",

@@ -18,6 +18,7 @@ i18n.setKeys({
 	"AnyRequest.AsGraph" : "En graphe",
 	"AnyRequest.AsJson" : "En JSON brut",
 	"AnyRequest.AsTable" : "En tableau",
+	"AnyRequest.Failed": "Échoué...",
 	"AnyRequest.History" : "Historique",
 	"AnyRequest.RepeatRequest" : "Répétition automatique de la requête",
 	"AnyRequest.RepeatRequestSelect" : "Répéter la requête toutes les ",

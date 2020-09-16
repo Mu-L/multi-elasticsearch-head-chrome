@@ -18,6 +18,7 @@ i18n.setKeys({
 	"AnyRequest.AsGraph" : "Sonuçları Çizdir",
 	"AnyRequest.AsJson" : "JSON formatında göster",
 	"AnyRequest.AsTable" : "Arama sonuçlarını tablo halinde göster",
+	"AnyRequest.Failed" : "Başarısız oldu...",
 	"AnyRequest.History" : "Geçmiş",
 	"AnyRequest.RepeatRequest" : "İsteği Tekrarla",
 	"AnyRequest.RepeatRequestSelect" : "İsteği sürekli tekrarla ",
