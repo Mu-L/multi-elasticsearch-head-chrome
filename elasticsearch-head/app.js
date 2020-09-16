@@ -832,7 +832,6 @@
 			this.config.cluster.get("_cluster/state", function(data) {
 				this.metaData = new app.data.MetaData({state: data});
 				this.fire("ready", this.metaData,  { originalData: data, "k": 1 }); // TODO originalData needed for legacy ui.FilterBrowser
-				$("body").trigger("onconnect", [ data ]);
 			}.bind(this), function() {
 
 				var _this = this;
@@ -1298,13 +1297,15 @@
 			return true;
 		},
 		request: function( params ) {
+			$("body").data("requesting", this.base_uri + params.path);
 			return $.ajax( $.extend({
 				url: this.base_uri + params.path,
 				contentType: "application/json",
 				dataType: "json",
 				error: function(xhr, type, message) {
 					if("console" in window) {
-						console.log({ "XHR Error": type, "message": message });
+						//console.log({ "XHR Error": type, "message": message });
+						$(".uiHeader-status").html(i18n.text("AnyRequest.Failed") + " " + $("body").data("requesting"));
 					}
 				}
 			},  params) );
@@ -1349,8 +1350,11 @@
 				}
 			}
 			var _cluster = this.cluster;
+			$(".uiHeader-status").html(i18n.text("AnyRequest.Requesting") + " " + _cluster.base_uri);
 			_cluster.get("_cluster/state", function( data ) {
 				clusterState = data;
+				data.base_uri = _cluster.base_uri;
+				data.cluster_version = _cluster.version
 				$("body").trigger("onconnect", [ data ]);
 				updateModel.call( self );
 			},function() {
@@ -3826,34 +3830,48 @@
 		_selectCluster_template: function(options) {
 			return { tag: "SELECT", children: options, onChange: this._changeCluster_handler };
 		},
-		_optionCluster_template: function(uri, name) {
-			return  { tag: "OPTION", value: uri, text: name + " (" + uri + ")" };
+		_optionCluster_template: function(uri, name, version) {
+			return  { tag: "OPTION", value: uri, text: name + " (" + uri + ")" + (version?  " (" + version + ")": "")};
 		},
-		_updateServerSelect: function (select_uri) {
+		_updateServerSelect: function (select_uri, select_name) {
 			var cluster_list = this.prefs.get("app-cluster_list");
 			var options = [];
+			var added = false;
 			if (cluster_list) {
 				for(i in cluster_list) {
 					name = cluster_list[i].name;
 					uri = cluster_list[i].uri;
+					version = cluster_list[i].version;
 					if (!uri) continue;
 					if (uri.indexOf('?') != -1) continue;
-					options.push(this._optionCluster_template(uri, name));
+					options.push(this._optionCluster_template(uri, name, version));
+					if (select_uri && uri == select_uri) {
+						added = true;
+					}
 				}
 			}
+			if (select_uri && !added) {
+				options.push(this._optionCluster_template(uri, select_name));
+			}
+
 			this.el.find(".uiClusterSelector-select").empty().append(this._selectCluster_template(options));
-			if (select_uri)
+			if (select_uri) {
 				this.el.find(".uiClusterSelector-select select").val(select_uri);
+			}
 		},
 		_addServer_handler: function (event, data) {
-			var base_uri = this.el.find(".uiClusterConnect-uri").val();
+			var base_uri = data.base_uri;
+			//this.el.find(".uiClusterSelector-select select").val();//this.el.find(".uiClusterConnect-uri").val();
 			cluster_list = this.prefs.get("app-cluster_list");
 			if (!cluster_list) {
 				cluster_list = { };
 			}
-			cluster_list[base_uri] = { uri: base_uri, name: data.cluster_name };
+			cluster_list[data.base_uri] =  { "uri" : data.base_uri, "name" : data.cluster_name, "version": data.cluster_version };
+			for (x in cluster_list) {
+				if (x[x.length - 1] != "/") delete cluster_list[x]; // Clean up URL without trailing space.
+			}
 			this.prefs.set("app-cluster_list", cluster_list);
-			this._updateServerSelect(base_uri);
+			this._updateServerSelect(base_uri, data.cluster_name);
 		},
 		_removeServer_handler: function () {
 			cluster_list = this.prefs.get("app-cluster_list");
@@ -3866,11 +3884,12 @@
 			var uri = this.el.find(".uiClusterSelector-select select").val();
 			this.el.find(".uiClusterConnect-uri").val(uri);
 			this._reconnect_handler();
-			this._updateServerSelect(uri);
+			this._updateServerSelect(uri, i18n.text("AnyRequest.Requesting"));
 		},
 		_promptConnect_handler: function() {
 			this.el.find(".uiClusterConnect-uri").val(prompt("Elasticsearch End-point URI?",this.el.find(".uiClusterConnect-uri").val()));
 			this._reconnect_handler();
+			this._updateServerSelect(uri, i18n.text("AnyRequest.Requesting"));
 		},
 		_main_template: function() {
             return { tag: "SPAN", cls: "uiClusterConnect", children: [
