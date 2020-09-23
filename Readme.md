@@ -5,19 +5,23 @@ This is a major improvement over Elasticsearch Head extension.
 * More minimal look
 * Able to handle non-JSON response in Any Request tab
 
-- [X] This extension is still "Pending Review" for Google Webstore (2020-09-16)
+- [X] This extension is now live on [Google Webstore](https://chrome.google.com/webstore/detail/multi-elasticsearch-head/cpmmilfkofbeimbmgiclohpodggeheim) (2020-09-13), You can add it to Chrome and Edge 
 
 ## Synopsis
 
 Chrome Extension containing the excellent [ElasticSearch Head](https://github.com/mobz/elasticsearch-head) application.
 
-## Motivation
+## Motivation of Multi Elasticsearch Head
+
+The original Elasticsearch Head doesn't offer us the easy ability to switch between different clusters, and the bookmark solution is not favorable to us.
+
+## Motivation of Elasticsearch Head
 
 This was created because ElasticSearch 5 removed the ability to run ElasticSearch Head as an Elastic Plugin.  This offers an alternative to self-hosting in your own web server.  It also has the advantage of bypassing CORS without configuring CORS on your Elastic server.
 
 ## Installation
 
-Head over to [ElasticSearch Head](https://chrome.google.com/webstore/detail/elasticsearch-head/ffmkiejjmecolpfloofpjologoblkegm) page on the Chrome Web Store.
+Head over to [Multi Elasticsearch Head](https://chrome.google.com/webstore/detail/multi-elasticsearch-head/cpmmilfkofbeimbmgiclohpodggeheim) page on the Chrome Web Store.
 
 ## Usage
 
@@ -29,16 +33,11 @@ Head over to [ElasticSearch Head](https://chrome.google.com/webstore/detail/elas
 
 To make this more convenient to use (ie: without having to enter in the remote ElasticSearch URL each time), it's helpful to know that you can decorate the URL to the plugin, and use a bookmark on your bookmark bar to use in the future.
 
-* If your ElasticSearch server is local, you can use
+* If your Elasticsearch server is local, you can use
 `chrome-extension://ffmkiejjmecolpfloofpjologoblkegm/elasticsearch-head/index.html?base_uri=http://localhost:9200`
-* If your ElasticSearch server is remote and you have to use a SSH tunnel through a jump host:
+* If your Elasticsearch server is remote and you have to use a SSH tunnel through a jump host:
 	* setup your tunnel (in my example, port 29200)
 	  `ssh -N -L 29200:myeshost:9200 myusername@jumphost`
 	* then use `chrome-extension://ffmkiejjmecolpfloofpjologoblkegm/elasticsearch-head/index.html?base_uri=http://localhost:29200` to get to the remote ES cluster.
 
-* If you have multiple remote ES clusters that you often connect to, making a folder in your bookmark bar, and then having each ES cluster can look pretty snazzy:
- 
-![](doc/multiple-es-head-bookmarks.png)
 
-## Contact
-[@hamburger_menu](https://twitter.com/hamburger_menu)
